@@ -1,36 +1,23 @@
-app = "helium-localization"
-primary_region = "sjc"  # San Jose, CA - you can change this to your preferred region
+# fly.toml app configuration file generated for helium-fokjxw on 2025-06-13T20:54:07Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'helium-fokjxw'
+primary_region = 'ord'
 
 [build]
-  dockerfile = "Dockerfile.frontend"
-
-[env]
-  PORT = "3000"
-  NEXT_PUBLIC_API_URL = "https://helium-localization-api.fly.dev"  # Points to your backend API
 
 [http_service]
   internal_port = 3000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ['app']
 
 [[vm]]
-  cpu_kind = "shared"
+  memory = '1gb'
+  cpu_kind = 'shared'
   cpus = 1
   memory_mb = 1024
-
-[[services]]
-  protocol = "tcp"
-  internal_port = 3000
-  processes = ["app"]
-
-  [[services.ports]]
-    port = 80
-    handlers = ["http"]
-    force_https = true
-
-  [[services.ports]]
-    port = 443
-    handlers = ["tls", "http"] 
