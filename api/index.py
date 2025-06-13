@@ -8,7 +8,14 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 # Import your FastAPI app
-from localization_management_api.main import app
+from localization_management_api.main import app as fastapi_app
+
+# Create a new FastAPI app instance
+app = FastAPI()
+
+# Copy all routes from the original app
+for route in fastapi_app.routes:
+    app.routes.append(route)
 
 # Define allowed origins
 ALLOWED_ORIGINS = [
@@ -26,7 +33,7 @@ app.add_middleware(
 )
 
 # Create handler for AWS Lambda
-handler = Mangum(app)
+handler = Mangum(app, lifespan="off")
 
 # For local development
 if __name__ == "__main__":

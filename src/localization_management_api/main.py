@@ -8,7 +8,6 @@ from pydantic import BaseModel
 from datetime import datetime
 import re
 from collections import defaultdict
-from mangum import Mangum
 
 load_dotenv()
 
@@ -333,5 +332,3 @@ async def validate_translations(project_id: str) -> List[ValidationResult]:
         return validation_results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-handler = Mangum(app)
