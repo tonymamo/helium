@@ -33,7 +33,7 @@ app.add_middleware(
 )
 
 # Create handler for AWS Lambda
-handler = Mangum(app, lifespan="off")
+handler = Mangum(app)
 
 # For local development
 if __name__ == "__main__":
