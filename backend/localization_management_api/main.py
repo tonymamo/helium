@@ -115,18 +115,7 @@ async def get_localizations(project_id: str, locale: str) -> Dict[str, Any]:
         
         # Get all translation keys and their values for the project
         response = supabase.table("translation_keys")\
-            .select("""
-                id,
-                key,
-                category,
-                description,
-                translation_values!inner(
-                    locale_code,
-                    value,
-                    updated_at,
-                    updated_by
-                )
-            """)\
+            .select("id,key,category,description,translation_values!inner(locale_code,value,updated_at,updated_by)")\
             .eq("project_id", project_id)\
             .eq("translation_values.locale_code", locale)\
             .execute()
@@ -275,15 +264,7 @@ async def validate_translations(project_id: str) -> List[ValidationResult]:
         
         # Get all translation keys and their values for the project
         response = supabase.table("translation_keys")\
-            .select("""
-                id,
-                key,
-                category,
-                translation_values(
-                    locale_code,
-                    value
-                )
-            """)\
+            .select("id,key,category,translation_values(locale_code,value)")\
             .eq("project_id", project_id)\
             .execute()
         
