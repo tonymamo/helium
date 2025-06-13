@@ -4,10 +4,10 @@ from mangum import Mangum
 import sys
 import os
 
-# Add the src directory to the Python path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+# Add the backend directory to the Python path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
-# Import your FastAPI app
+# Import your FastAPI app directly since we're in the same directory
 from localization_management_api.main import app as fastapi_app
 
 # Create a new FastAPI app instance
@@ -19,7 +19,7 @@ for route in fastapi_app.routes:
 
 # Define allowed origins
 ALLOWED_ORIGINS = [
-    "https://tonymamo-helium.vercel.app",
+    "https://helium-localization.fly.dev",
     "http://localhost:3000",  # For local development
 ]
 
