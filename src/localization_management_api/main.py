@@ -8,13 +8,22 @@ from pydantic import BaseModel
 from datetime import datetime
 import re
 from collections import defaultdict
+import httpx
 
 load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+# Create a custom httpx client without proxies
+custom_http_client = httpx.Client(
+    timeout=30.0,
+    verify=True,
+    follow_redirects=True
+)
+
+# Initialize Supabase client with just the required parameters
+supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 app = FastAPI()
 
