@@ -1,15 +1,16 @@
-app = "helium-localization"
+app = "helium-localization-api"
 primary_region = "sjc"  # San Jose, CA - you can change this to your preferred region
 
 [build]
-  dockerfile = "Dockerfile.frontend"
+  dockerfile = "Dockerfile"
 
 [env]
-  PORT = "3000"
-  NEXT_PUBLIC_API_URL = "https://helium-localization-api.fly.dev"  # Points to your backend API
+  PORT = "8080"
+  SUPABASE_URL = ""  # You'll need to set this in Fly.io dashboard
+  SUPABASE_ANON_KEY = ""  # You'll need to set this in Fly.io dashboard
 
 [http_service]
-  internal_port = 3000
+  internal_port = 8080
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
@@ -23,7 +24,7 @@ primary_region = "sjc"  # San Jose, CA - you can change this to your preferred r
 
 [[services]]
   protocol = "tcp"
-  internal_port = 3000
+  internal_port = 8080
   processes = ["app"]
 
   [[services.ports]]
