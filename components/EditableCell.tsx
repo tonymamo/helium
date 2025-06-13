@@ -40,6 +40,7 @@ const EditableCell = ({ initialValue, localizationKey }: EditableCellProps) => {
         sel?.removeAllRanges();
         sel?.addRange(range);
       } catch (e) {
+        console.error("Error setting range:", e);
         // If setting the range fails, just put cursor at end
         range.selectNodeContents(cellRef.current);
         range.collapse(false);
