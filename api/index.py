@@ -19,7 +19,7 @@ for route in fastapi_app.routes:
 
 # Define allowed origins
 ALLOWED_ORIGINS = [
-    "https://helium-p22umvyfb-tonymamos-projects.vercel.app",
+    "https://tonymamo-helium.vercel.app",
     "http://localhost:3000",  # For local development
 ]
 
