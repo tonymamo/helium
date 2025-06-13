@@ -70,3 +70,8 @@ ENV/
 env.bak/
 venv.bak/
 .venv/
+
+# playwright
+.playwright
+test-results/
+playwright-report/

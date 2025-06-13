@@ -1,10 +1,15 @@
 # Localization Management
 
+## Walkthrough of changes
+
+TODO
 
 ## API Setup
+
 This is a FastAPI application to manage localizations.
 
 1.  Create a virtual environment (optional but recommended):
+
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
@@ -31,6 +36,7 @@ To get localizations for a project, you can access:
 ---
 
 ## Frontend Setup
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 First, run the development server:
