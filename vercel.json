@@ -7,7 +7,11 @@
     },
     {
       "src": "api/vercel_handler.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "buildCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+        "installCommand": "apt-get update && apt-get install -y build-essential cmake"
+      }
     }
   ],
   "routes": [
