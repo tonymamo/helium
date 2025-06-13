@@ -33,7 +33,12 @@ declare module "@tanstack/react-table" {
 }
 
 // copied from docs at https://tanstack.com/table/v8/docs/framework/react/examples/filters-fuzzy
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+const fuzzyFilter: FilterFn<TranslationKey> = (
+  row,
+  columnId,
+  value,
+  addMeta,
+) => {
   // Get all the fields we want to search
   const key = row.getValue("key");
   const category = row.original.category;

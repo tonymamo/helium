@@ -61,7 +61,8 @@ const EditableCell = ({ initialValue, localizationKey }: EditableCellProps) => {
             },
           },
         });
-      } catch (error) {
+      } catch (error: unknown) {
+        console.error("Error updating localizations:", error);
         setValue(initialValue);
         if (cellRef.current) {
           cellRef.current.textContent = initialValue;
