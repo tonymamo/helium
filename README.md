@@ -24,7 +24,7 @@ This is a FastAPI application to manage localizations.
 
 ```bash
 # uvicorn src.localization_management_api.main:app --reload
-uvicorn api.index:app --reload
+cd backend && uvicorn index:app --reload
 ```
 
 The API will be available at `http://127.0.0.1:8000`.
