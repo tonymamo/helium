@@ -2,13 +2,21 @@ import os
 from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
 from fastapi import FastAPI
+import httpx
+
+# Patch httpx's default client settings
+original_init = httpx.Client.__init__
+def patched_init(self, *args, **kwargs):
+    kwargs.pop('proxy', None)  # Remove proxy if present
+    return original_init(self, *args, **kwargs)
+httpx.Client.__init__ = patched_init
+
 from supabase import create_client, Client
 from typing import Dict, List, Any, Optional, Set
 from pydantic import BaseModel
 from datetime import datetime
 import re
 from collections import defaultdict
-import httpx
 
 load_dotenv()
 

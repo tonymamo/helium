@@ -1,8 +1,6 @@
 from api.index import app
-from awslambdaric.lambda_handler import LambdaHandler
-import json
 
-def handler(event, context):
+def handler(event):
     """
     AWS Lambda handler that processes API Gateway events
     """
