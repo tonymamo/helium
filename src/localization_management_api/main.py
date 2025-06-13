@@ -3,9 +3,11 @@ from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from supabase import create_client, Client
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Set
 from pydantic import BaseModel
 from datetime import datetime
+import re
+from collections import defaultdict
 
 load_dotenv()
 
@@ -47,6 +49,13 @@ class TranslationKeyCreate(BaseModel):
 class TranslationUpdate(BaseModel):
     value: str
     updated_by: str
+
+class ValidationResult(BaseModel):
+    key: str
+    category: str
+    missing_translations: List[str]  # list of locales missing this translation
+    missing_interpolations: Dict[str, List[str]]  # locale -> list of missing variables
+    inconsistent_interpolations: Dict[str, List[str]]  # locale -> list of inconsistent variables
 
 @app.get("/projects", response_model=List[Project])
 async def get_projects() -> List[Project]:
@@ -232,5 +241,94 @@ async def create_translation_key(
             .execute()
         
         return response.data[0]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/translation-validation/{project_id}", response_model=List[ValidationResult])
+async def validate_translations(project_id: str) -> List[ValidationResult]:
+    try:
+        # Verify project exists
+        project = supabase.table("projects").select("id").eq("id", project_id).execute()
+        if not project.data:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Get all available locales
+        locales_response = supabase.table("locales").select("code").execute()
+        all_locales = {locale["code"] for locale in locales_response.data}
+        
+        # Get all translation keys and their values for the project
+        response = supabase.table("translation_keys")\
+            .select("""
+                id,
+                key,
+                category,
+                translation_values(
+                    locale_code,
+                    value
+                )
+            """)\
+            .eq("project_id", project_id)\
+            .execute()
+        
+        # Regular expression to find interpolation patterns
+        interpolation_pattern = r'%?{([^}]+)}'
+        
+        validation_results = []
+        
+        for item in response.data:
+            # Get all locales that have translations for this key
+            existing_locales = {tv["locale_code"] for tv in item["translation_values"]}
+            # Find locales that are missing translations
+            missing_translations = list(all_locales - existing_locales)
+            
+            # Dictionary to store interpolations per locale
+            locale_interpolations: Dict[str, Set[str]] = defaultdict(set)
+            
+            # Find all interpolations in each locale
+            for tv in item["translation_values"]:
+                if not tv["value"]:
+                    continue
+                    
+                locale = tv["locale_code"]
+                # Find all interpolation variables
+                variables = set(re.findall(interpolation_pattern, tv["value"]))
+                locale_interpolations[locale] = variables
+            
+            # If we have translations in multiple locales, compare them
+            if len(locale_interpolations) > 1:
+                # Get all unique variables across all locales
+                all_variables = set()
+                for variables in locale_interpolations.values():
+                    all_variables.update(variables)
+                
+                # Find missing and inconsistent interpolations
+                missing_interpolations = {}
+                inconsistent_interpolations = {}
+                
+                for locale, variables in locale_interpolations.items():
+                    # Find missing variables
+                    missing = list(all_variables - variables)
+                    if missing:
+                        missing_interpolations[locale] = missing
+                    
+                    # Find inconsistent variables (present in this locale but missing in others)
+                    inconsistent = []
+                    for var in variables:
+                        if any(var not in other_vars for other_locale, other_vars in locale_interpolations.items() if other_locale != locale):
+                            inconsistent.append(var)
+                    if inconsistent:
+                        inconsistent_interpolations[locale] = inconsistent
+            
+            # Add to validation results if there are any issues
+            if missing_translations or missing_interpolations or inconsistent_interpolations:
+                validation_results.append(ValidationResult(
+                    key=item["key"],
+                    category=item["category"],
+                    missing_translations=missing_translations,
+                    missing_interpolations=missing_interpolations,
+                    inconsistent_interpolations=inconsistent_interpolations
+                ))
+        
+        return validation_results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

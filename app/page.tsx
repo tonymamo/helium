@@ -3,6 +3,7 @@
 import { useLocalizations } from "@/app/hooks/useLocalizations";
 import { useProjects } from "@/app/hooks/useProjects";
 import { useLocales } from "@/app/hooks/useLocales";
+import { useTranslationValidation } from "@/app/hooks/useTranslationValidation";
 import { useTranslationManagementStore } from "@/app/providers/StoreProvider";
 import TranslationKeyManager from "@/components/TranslationKeyManager";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,23 @@ export default function Home() {
     selectedProject,
     selectedLocale,
   );
+
+  const { isValidating, error, validationResults, validateProject } =
+    useTranslationValidation();
+
+  const handleValidate = async () => {
+    if (!selectedProject) {
+      console.log("Please select a project first");
+      return;
+    }
+    await validateProject(selectedProject);
+    alert("check the console for validation results");
+    if (error) {
+      console.error("Validation error:", error);
+    } else if (validationResults) {
+      console.log("Validation results:", validationResults);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-stone-100 dark:bg-stone-900 text-stone-800 dark:text-stone-200 font-[family-name:var(--font-geist-sans)]">
@@ -145,7 +163,18 @@ export default function Home() {
               />
             </div>
 
-            <Button>Add Key</Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={() => alert("not implemented yet")}>
+                Add Key
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleValidate}
+                disabled={isValidating || !selectedProject}
+              >
+                {isValidating ? "Validating..." : "Validate"}
+              </Button>
+            </div>
           </div>
 
           {/* Translation Keys List / Editor Area */}
