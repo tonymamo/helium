@@ -35,6 +35,9 @@ app.add_middleware(
 # Create handler for AWS Lambda
 handler = Mangum(app)
 
+# Export the handler directly
+__all__ = ["handler"]
+
 # For local development
 if __name__ == "__main__":
     import uvicorn
